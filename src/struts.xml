@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+        <package name="course" extends="struts-default">
+                <action name="addSchoolInfo" class="com.course.server.AddSchoolInfo"></action>
+                <action name="addCourseInfo" class="com.course.server.AddCourseInfo"></action>
+                <action name="addStudentInfo" class="com.course.server.AddStudentInfo"></action>
+                <action name="queryCourseById" class="com.course.server.QueryCourseById"></action>
+                <action name="queryCourseByTime" class="com.course.server.QueryCourseByTime"></action>
+                <action name="querySchedule" class="com.course.server.QuerySchedule"></action>
+                <action name="selectCourse" class="com.course.server.SelectCourse"></action>
+                <action name="dropCourse" class="com.course.server.DropCourse"></action>
+                <action name="clearData" class="com.course.server.ClearData"></action>
+        </package>
+</struts>
