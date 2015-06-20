@@ -8,6 +8,7 @@ import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
 import com.course.bean.StudentInfo;
 import com.opensymphony.xwork2.ActionSupport;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.course.function.PrintToHtml;
@@ -28,20 +29,27 @@ public class QueryCourseById extends ActionSupport implements ServletResponseAwa
 
     //定义处理用户请求的execute方法
     public String execute() {
-        String ret = "";
-        JSONObject obj = new JSONObject();
+        String ret = null;
+        JSONObject jsob = new JSONObject();
         //TODO 代码写在这里
-        DataAccessInterface<CourseInfo> dac = DACFactory.getInstance().createDAC(CourseInfo.class);
-        Condition<CourseInfo> condition = new Condition<CourseInfo>() {
-            @Override
-            public boolean assertBean(CourseInfo courseInfo) {
-                return courseInfo.getCourseId().contains(courseId);
-            }
-        };
-        //得到所有course
-        for (CourseInfo s :dac.selectByCondition(condition))
-            System.err.println(s);
-        ret = obj.toString();
+        try {
+            DataAccessInterface<CourseInfo> dac = DACFactory.getInstance().createDAC(CourseInfo.class);
+            Condition<CourseInfo> condition = new Condition<CourseInfo>() {
+                @Override
+                public boolean assertBean(CourseInfo courseInfo) {
+                    return courseInfo.getCourseId().contains(courseId);
+                }
+            };
+            //得到所有course
+            JSONArray jsonArray = new JSONArray();
+            for (CourseInfo s : dac.selectByCondition(condition))
+                jsonArray.put(new JSONObject(s));
+
+            jsob.put("courses",jsonArray);
+        } catch (Exception e) {
+
+        }
+        ret = jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
     }

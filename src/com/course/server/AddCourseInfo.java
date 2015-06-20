@@ -2,9 +2,11 @@ package com.course.server;/**
  * Created by snow on 15-6-19.
  */
 
+import cn.edu.fudan.se.dac.Condition;
 import cn.edu.fudan.se.dac.DACFactory;
 import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
+import com.course.bean.Time;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,9 +14,8 @@ import org.json.JSONObject;
 import com.course.function.PrintToHtml;
 import org.apache.struts2.interceptor.ServletResponseAware;
 
-import java.sql.*;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.datatype.DatatypeFactory;
 
 public class AddCourseInfo extends ActionSupport implements ServletResponseAware {
     private static final long serialVersionUID = 1L;
@@ -25,102 +26,69 @@ public class AddCourseInfo extends ActionSupport implements ServletResponseAware
         this.response = httpServletResponse;
     }
 
-    private String courseId;
-    private String schoolName;
-    private String courseName;
-    private String teacherName;
-    private String credit;
-    private String location;
-    private Time time;
-    private int capacity;
+    private String course;
 
     //定义处理用户请求的execute方法
     public String execute() {
         String ret = "";
-        //TODO 代码写在这里
-        CourseInfo ci = new CourseInfo();
-        ci.setCourseId(courseId);
-        ci.setSchoolName(schoolName);
-        ci.setCourseName(courseName);
-        ci.setTeacherName(teacherName);
-        ci.setCredit(credit);
-        ci.setLocation(location);
-        ci.setTime(time);
-        ci.setCapacity(capacity);
+        JSONObject jsob = new JSONObject();
+        try {
+            //TODO 代码写在这里
+            JSONObject jsonObject = new JSONObject(course);
+            CourseInfo ci = new CourseInfo();
+            String courseId = jsonObject.getString("courseId");
+            ci.setCourseId(jsonObject.getString("courseId"));
+            ci.setSchoolName(jsonObject.getString("schoolName"));
+            ci.setCourseName(jsonObject.getString("courseName"));
+            ci.setTeacherName(jsonObject.getString("teacherName"));
+            ci.setCredit(jsonObject.getInt("credit"));
+            ci.setLocation(jsonObject.getString("location"));
+            ci.setCapacity(jsonObject.getInt("capacity"));
+            ci.setSurplus(jsonObject.getInt("capacity"));//课程余量与容量一致
 
-        //加入dac
-        DataAccessInterface<CourseInfo> dac = DACFactory.getInstance().createDAC(CourseInfo.class);
-        //TODO 判断是否已存等
-        dac.beginTransaction();
-        dac.add(ci);
-        dac.commit();
+            JSONObject jsobTime = jsonObject.getJSONObject("time");
+            Time time = new Time();
+            time.setWeekday(jsobTime.getInt("weekday"));
+            time.setPeriod(jsobTime.getInt("period"));
+            ci.setTime(time);
 
-        ret = "success";
+            //加入dac
+            DataAccessInterface<CourseInfo> dac = DACFactory.getInstance().createDAC(CourseInfo.class);
+            Condition<CourseInfo> condition = new Condition<CourseInfo>() {
+                @Override
+                public boolean assertBean(CourseInfo courseInfo) {
+                    return courseInfo.getCourseId().equals(courseId);
+                }
+            };
+            //判断选课号是否已存在
+            List list = dac.selectByCondition(condition);
+            if (list.size() > 0) {
+                jsob.put("success", false);
+                jsob.put("failReason", "选课号已存在");
+                ret = jsob.toString();
+                PrintToHtml.PrintToHtml(response, ret);
+                return null;
+            }
+
+            //TODO 判断时间地点、教师冲突、院系不存在
+            dac.beginTransaction();
+            dac.add(ci);
+            dac.commit();
+            jsob.put("success", true);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ret = jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
     }
 
-    public String getCourseId() {
-        return courseId;
+    public String getCourse() {
+        return course;
     }
 
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
-    }
-
-    public String getSchoolName() {
-        return schoolName;
-    }
-
-    public void setSchoolName(String schoolName) {
-        this.schoolName = schoolName;
-    }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
-    public String getTeacherName() {
-        return teacherName;
-    }
-
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
-    }
-
-    public String getCredit() {
-        return credit;
-    }
-
-    public void setCredit(String credit) {
-        this.credit = credit;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public Time getTime() {
-        return time;
-    }
-
-    public void setTime(Time time) {
-        this.time = time;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
+    public void setCourse(String course) {
+        this.course = course;
     }
 }

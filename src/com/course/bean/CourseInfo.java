@@ -1,6 +1,5 @@
 package com.course.bean;
 
-import java.sql.Time;
 
 /**
  * Created by snow on 15-6-19.
@@ -10,10 +9,11 @@ public class CourseInfo {
     private String schoolName;
     private String courseName;
     private String teacherName;
-    private String credit;
+    private int credit;
     private String location;
     private Time time;
     private int capacity;
+    private int surplus;//余量
 
     public String getCourseId() {
         return courseId;
@@ -47,11 +47,11 @@ public class CourseInfo {
         this.teacherName = teacherName;
     }
 
-    public String getCredit() {
+    public int getCredit() {
         return credit;
     }
 
-    public void setCredit(String credit) {
+    public void setCredit(int credit) {
         this.credit = credit;
     }
 
@@ -77,5 +77,13 @@ public class CourseInfo {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public int getSurplus() {
+        return surplus;
+    }
+
+    public void setSurplus(int surplus) {
+        this.surplus = surplus;
     }
 }

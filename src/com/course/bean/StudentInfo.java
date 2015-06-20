@@ -1,5 +1,7 @@
 package com.course.bean;
 
+import java.util.List;
+
 /**
  * Created by snow on 15-6-19.
  */
@@ -8,6 +10,7 @@ public class StudentInfo {
     private String name;
     private String gender;
     private String schoolName;
+    private List<String> courseId;
 
     public String getStudentId() {
         return studentId;
@@ -39,5 +42,13 @@ public class StudentInfo {
 
     public void setSchoolName(String schoolName) {
         this.schoolName = schoolName;
+    }
+
+    public List<String> getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(List<String> courseId) {
+        this.courseId = courseId;
     }
 }

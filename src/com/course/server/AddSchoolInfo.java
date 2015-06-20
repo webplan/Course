@@ -2,8 +2,10 @@ package com.course.server;/**
  * Created by snow on 15-6-19.
  */
 
+import cn.edu.fudan.se.dac.Condition;
 import cn.edu.fudan.se.dac.DACFactory;
 import cn.edu.fudan.se.dac.DataAccessInterface;
+import com.course.bean.CourseInfo;
 import com.course.bean.SchoolInfo;
 import com.course.function.PrintToHtml;
 import com.opensymphony.xwork2.ActionSupport;
@@ -16,6 +18,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 public class AddSchoolInfo extends ActionSupport implements ServletResponseAware {
@@ -33,19 +36,38 @@ public class AddSchoolInfo extends ActionSupport implements ServletResponseAware
     //定义处理用户请求的execute方法
     public String execute() {
         String ret = "";
-        JSONObject obj = new JSONObject();
+        JSONObject jsob = new JSONObject();
         //TODO 代码写在这里
-        SchoolInfo si = new SchoolInfo();
-        si.setSchoolName(schoolName);
-        si.setCreditRequirement(creditRequirement);
+        try {
+            SchoolInfo si = new SchoolInfo();
+            si.setSchoolName(schoolName);
+            si.setCreditRequirement(creditRequirement);
 
-        DataAccessInterface<SchoolInfo> dac = DACFactory.getInstance().createDAC(SchoolInfo.class);
-        //TODO
-        dac.beginTransaction();
-        dac.add(si);
-        dac.commit();
+            //加入dac
+            DataAccessInterface<SchoolInfo> dac = DACFactory.getInstance().createDAC(SchoolInfo.class);
+            Condition<SchoolInfo> condition = new Condition<SchoolInfo>() {
+                @Override
+                public boolean assertBean(SchoolInfo schoolInfo) {
+                    return schoolInfo.getSchoolName().equals(schoolName);
+                }
+            };
+            //TODO 判断是否已存等
+            List list = dac.selectByCondition(condition);
+            if (list.size() > 0) {
+                jsob.put("success", false);
+                jsob.put("failReason", "选课号已存在");
+            } else {
+                dac.beginTransaction();
+                dac.add(si);
+                dac.commit();
+                jsob.put("success", true);
+            }
 
 
+        } catch (Exception e) {
+
+        }
+        ret=jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
     }

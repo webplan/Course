@@ -2,8 +2,10 @@ package com.course.server;/**
  * Created by snow on 15-6-19.
  */
 
+import cn.edu.fudan.se.dac.Condition;
 import cn.edu.fudan.se.dac.DACFactory;
 import cn.edu.fudan.se.dac.DataAccessInterface;
+import com.course.bean.SchoolInfo;
 import com.course.bean.StudentInfo;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONException;
@@ -16,6 +18,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 public class AddStudentInfo extends ActionSupport implements ServletResponseAware {
@@ -35,21 +38,58 @@ public class AddStudentInfo extends ActionSupport implements ServletResponseAwar
     //定义处理用户请求的execute方法
     public String execute() {
         String ret = "";
-        JSONObject obj = new JSONObject();
-        //TODO 代码写在这里
-        StudentInfo si = new StudentInfo();
-        si.setStudentId(studentId);
-        si.setName(name);
-        si.setGender(gender);
-        si.setSchoolName(schoolName);
+        JSONObject jsob = new JSONObject();
+        try {
+            StudentInfo si = new StudentInfo();
+            si.setStudentId(studentId);
+            si.setName(name);
+            si.setGender(gender);
+            si.setSchoolName(schoolName);
 
-        DataAccessInterface<StudentInfo> dac = DACFactory.getInstance().createDAC(StudentInfo.class);
-        //TODO
-        dac.beginTransaction();
-        dac.add(si);
-        dac.commit();
+            //加入dac
+            DataAccessInterface<SchoolInfo> dacSch = DACFactory.getInstance().createDAC(SchoolInfo.class);
+
+            //判断学院是否存在
+            Condition<SchoolInfo> conditionSch = new Condition<SchoolInfo>() {
+                @Override
+                public boolean assertBean(SchoolInfo SchoolInfo) {
+                    return SchoolInfo.getSchoolName().equals(schoolName);
+                }
+            };
+            List list = dacSch.selectByCondition(conditionSch);
+            if (list.size() == 0) {
+                jsob.put("success", false);
+                jsob.put("failReason", "学院不存在");
+                ret=jsob.toString();
+                PrintToHtml.PrintToHtml(response, ret);
+                return null;
+            }
+
+            DataAccessInterface<StudentInfo> dac = DACFactory.getInstance().createDAC(StudentInfo.class);
+            //判断学号是否存在
+            Condition<StudentInfo> condition = new Condition<StudentInfo>() {
+                @Override
+                public boolean assertBean(StudentInfo studentInfo) {
+                    return studentInfo.getStudentId().equals(studentId);
+                }
+            };
+            //TODO 判断是否已存等
+            list = dac.selectByCondition(condition);
+            if (list.size() > 0) {
+                jsob.put("success", false);
+                jsob.put("failReason", "学号已存在");
+            } else {
+                dac.beginTransaction();
+                dac.add(si);
+                dac.commit();
+                jsob.put("success", true);
+            }
 
 
+        } catch (Exception e) {
+
+        }
+        ret=jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
     }
