@@ -24,7 +24,7 @@ public class ClearData extends ActionSupport implements ServletResponseAware {
         this.response = httpServletResponse;
     }
 
-    private String account;
+
 
     //定义处理用户请求的execute方法
     public String execute() {
@@ -35,14 +35,6 @@ public class ClearData extends ActionSupport implements ServletResponseAware {
         ret = obj.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 
 }

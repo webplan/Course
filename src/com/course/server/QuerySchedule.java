@@ -3,16 +3,11 @@ package com.course.server;/**
  */
 
 import com.opensymphony.xwork2.ActionSupport;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.course.function.PrintToHtml;
 import org.apache.struts2.interceptor.ServletResponseAware;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import javax.servlet.http.HttpServletResponse;
 
 public class QuerySchedule extends ActionSupport implements ServletResponseAware {
@@ -24,7 +19,7 @@ public class QuerySchedule extends ActionSupport implements ServletResponseAware
         this.response = httpServletResponse;
     }
 
-    private String account;
+    private String studentId;
 
     //定义处理用户请求的execute方法
     public String execute() {
@@ -37,12 +32,11 @@ public class QuerySchedule extends ActionSupport implements ServletResponseAware
         return null;
     }
 
-    public String getAccount() {
-        return account;
+    public String getStudentId() {
+        return studentId;
     }
 
-    public void setAccount(String account) {
-        this.account = account;
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
-
 }

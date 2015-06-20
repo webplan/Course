@@ -31,5 +31,6 @@
     <orderEntry type="library" name="Struts 2" level="project" />
     <orderEntry type="library" name="javax.annotation" level="project" />
     <orderEntry type="library" name="java-json" level="project" />
+    <orderEntry type="library" name="dac-1.0-beta" level="project" />
   </component>
 </module>

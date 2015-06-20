@@ -24,7 +24,8 @@ public class SelectCourse extends ActionSupport implements ServletResponseAware 
         this.response = httpServletResponse;
     }
 
-    private String account;
+    private String courseId;
+    private String studentId;
 
     //定义处理用户请求的execute方法
     public String execute() {
@@ -37,12 +38,19 @@ public class SelectCourse extends ActionSupport implements ServletResponseAware 
         return null;
     }
 
-    public String getAccount() {
-        return account;
+    public String getCourseId() {
+        return courseId;
     }
 
-    public void setAccount(String account) {
-        this.account = account;
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
     }
 
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
 }
