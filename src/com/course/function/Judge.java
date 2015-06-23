@@ -18,7 +18,7 @@ public class Judge {
     final static DataAccessInterface<SchoolInfo> dacSch = DACFactory.getInstance().createDAC(SchoolInfo.class);
     final static DataAccessInterface<StudentInfo> dacStu = DACFactory.getInstance().createDAC(StudentInfo.class);
     final static DataAccessInterface<CourseInfo> dacCou = DACFactory.getInstance().createDAC(CourseInfo.class);
-    //  学院不存在 false
+    //  学院不存在 不存在：true
     public static boolean isSchool(String schoolName){
 
         Condition<SchoolInfo> conditionSch = new Condition<SchoolInfo>() {
@@ -29,12 +29,12 @@ public class Judge {
         };
         List list = dacSch.selectByCondition(conditionSch);
         if (list.size() == 0)
-            return false;
-        else
             return true;
+        else
+            return false;
     }
 
-    //  学生不存在 false
+    //  学生不存在 不存在：true
     public static boolean isStudent(String studentId){
         Condition<StudentInfo> conditionStu = new Condition<StudentInfo>() {
             @Override
@@ -44,12 +44,12 @@ public class Judge {
         };
         List list = dacStu.selectByCondition(conditionStu);
         if (list.size() == 0)
-            return false;
-        else
             return true;
+        else
+            return false;
     }
 
-    //  课程不存在 false
+    //  课程不存在 不存在：true
     public static boolean isCourse(String courseId){
         Condition<CourseInfo> conditionCou = new Condition<CourseInfo>() {
             @Override
@@ -59,9 +59,9 @@ public class Judge {
         };
         List list = dacCou.selectByCondition(conditionCou);
         if (list.size() == 0)
-            return false;
-        else
             return true;
+        else
+            return false;
     }
 
     //录入课程  时间地点唯一 不唯一（冲突）：false
@@ -161,11 +161,11 @@ public class Judge {
     }
 
     //TODO 学分   已满 false
-    public static boolean isCredit(){
-        return false;
+    public static boolean isStudentCredit(String studentId){
+        return true;
     }
 
-    // 选课人数已满
+    // 选课人数已满 未满：true
     public static boolean isSelectFull(String courseId){
         Condition<CourseInfo> conditionCou = new Condition<CourseInfo>() {
             @Override

@@ -7,6 +7,8 @@ import cn.edu.fudan.se.dac.DACFactory;
 import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
 import com.course.bean.Time;
+import com.course.function.Config;
+import com.course.function.Judge;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,27 +56,32 @@ public class AddCourseInfo extends ActionSupport implements ServletResponseAware
 
             //加入dac
             DataAccessInterface<CourseInfo> dac = DACFactory.getInstance().createDAC(CourseInfo.class);
-            Condition<CourseInfo> condition = new Condition<CourseInfo>() {
-                @Override
-                public boolean assertBean(CourseInfo courseInfo) {
-                    return courseInfo.getCourseId().equals(courseId);
+            //判断课程、时间地点、教师冲突、院系
+            if (Judge.isCourse(courseId))//课程不存在
+                if (Judge.isTimeOrLocation(time,jsonObject.getString("location")))//时间地点不冲突
+                    if (Judge.isTeacherTime(time,jsonObject.getString("teacherName")))//教师时间不冲突
+                        if (!Judge.isSchool(jsonObject.getString("schoolName"))) {//院系存在
+                            dac.beginTransaction();
+                            dac.add(ci);
+                            dac.commit();
+                            jsob.put(Config.SUCCESS, true);
+                        }else{//院系不存在
+                            jsob.put(Config.SUCCESS,false);
+                            jsob.put(Config.FAILREASON,Config.SCHOOL_NOT_EXIST);
+                        }
+                    else{//教师时间冲突
+                        jsob.put(Config.SUCCESS,false);
+                        jsob.put(Config.FAILREASON,Config.TEACHER_CONFLICT);
+                    }
+                else{//时间地点冲突
+                    jsob.put(Config.SUCCESS,false);
+                    jsob.put(Config.FAILREASON,Config.TIME_LOCATION_CONFLICT);
                 }
-            };
-            //判断选课号是否已存在
-            List list = dac.selectByCondition(condition);
-            if (list.size() > 0) {
-                jsob.put("success", false);
-                jsob.put("failReason", "选课号已存在");
-                ret = jsob.toString();
-                PrintToHtml.PrintToHtml(response, ret);
-                return null;
+            else{//课程已存在
+                jsob.put(Config.SUCCESS,false);
+                jsob.put(Config.FAILREASON,Config.COURSE_NUMBER_EXIST);
             }
 
-            //TODO 判断时间地点、教师冲突、院系不存在
-            dac.beginTransaction();
-            dac.add(ci);
-            dac.commit();
-            jsob.put("success", true);
 
         } catch (JSONException e) {
             e.printStackTrace();

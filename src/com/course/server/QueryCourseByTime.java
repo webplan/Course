@@ -7,6 +7,7 @@ import cn.edu.fudan.se.dac.DACFactory;
 import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
 import com.course.bean.Time;
+import com.course.function.Config;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +52,7 @@ public class QueryCourseByTime extends ActionSupport implements ServletResponseA
             for (CourseInfo s : dac.selectByCondition(condition))
                 jsonArray.put(new JSONObject(s));
 
-            jsob.put("courses", jsonArray);
+            jsob.put(Config.COURSES, jsonArray);
 
         } catch (JSONException e) {
             e.printStackTrace();

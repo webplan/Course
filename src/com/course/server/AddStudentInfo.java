@@ -7,6 +7,8 @@ import cn.edu.fudan.se.dac.DACFactory;
 import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.SchoolInfo;
 import com.course.bean.StudentInfo;
+import com.course.function.Config;
+import com.course.function.Judge;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,43 +48,21 @@ public class AddStudentInfo extends ActionSupport implements ServletResponseAwar
             si.setGender(gender);
             si.setSchoolName(schoolName);
 
-            //加入dac
-            DataAccessInterface<SchoolInfo> dacSch = DACFactory.getInstance().createDAC(SchoolInfo.class);
-
-            //判断学院是否存在
-            Condition<SchoolInfo> conditionSch = new Condition<SchoolInfo>() {
-                @Override
-                public boolean assertBean(SchoolInfo SchoolInfo) {
-                    return SchoolInfo.getSchoolName().equals(schoolName);
+            //判断学号、学院
+            if (Judge.isStudent(studentId)){//学号不存在
+                if (!Judge.isSchool(schoolName)){//院系存在
+                    DataAccessInterface<StudentInfo> dac = DACFactory.getInstance().createDAC(StudentInfo.class);
+                    dac.beginTransaction();
+                    dac.add(si);
+                    dac.commit();
+                    jsob.put(Config.SUCCESS, true);
+                }else{
+                    jsob.put(Config.SUCCESS,false);
+                    jsob.put(Config.FAILREASON,Config.SCHOOL_NOT_EXIST);
                 }
-            };
-            List list = dacSch.selectByCondition(conditionSch);
-            if (list.size() == 0) {
-                jsob.put("success", false);
-                jsob.put("failReason", "学院不存在");
-                ret=jsob.toString();
-                PrintToHtml.PrintToHtml(response, ret);
-                return null;
-            }
-
-            DataAccessInterface<StudentInfo> dac = DACFactory.getInstance().createDAC(StudentInfo.class);
-            //判断学号是否存在
-            Condition<StudentInfo> condition = new Condition<StudentInfo>() {
-                @Override
-                public boolean assertBean(StudentInfo studentInfo) {
-                    return studentInfo.getStudentId().equals(studentId);
-                }
-            };
-            //TODO 判断是否已存等
-            list = dac.selectByCondition(condition);
-            if (list.size() > 0) {
-                jsob.put("success", false);
-                jsob.put("failReason", "学号已存在");
-            } else {
-                dac.beginTransaction();
-                dac.add(si);
-                dac.commit();
-                jsob.put("success", true);
+            }else{
+                jsob.put(Config.SUCCESS,false);
+                jsob.put(Config.FAILREASON,Config.STUDENT_NUMBER_EXIST);
             }
 
 

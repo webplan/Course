@@ -7,6 +7,7 @@ import cn.edu.fudan.se.dac.DACFactory;
 import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
 import com.course.bean.StudentInfo;
+import com.course.function.Config;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,8 +45,10 @@ public class QueryCourseById extends ActionSupport implements ServletResponseAwa
             JSONArray jsonArray = new JSONArray();
             for (CourseInfo s : dac.selectByCondition(condition))
                 jsonArray.put(new JSONObject(s));
-
-            jsob.put("courses",jsonArray);
+            //课程信息不存在返回 null
+            if (jsonArray.length()==0)
+                jsonArray = null;
+            jsob.put(Config.COURSE,jsonArray);
         } catch (Exception e) {
 
         }

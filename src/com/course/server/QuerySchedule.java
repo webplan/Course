@@ -7,6 +7,7 @@ import cn.edu.fudan.se.dac.DACFactory;
 import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
 import com.course.bean.StudentInfo;
+import com.course.function.Config;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,7 +45,7 @@ public class QuerySchedule extends ActionSupport implements ServletResponseAware
             };
             List<StudentInfo> listStu = dacStu.selectByCondition(conditionStu);
             if (listStu.size()==0){
-                //TODO 文档中没有，若学生id不存在怎么处理
+                //TODO 文档中没有，若学生id不存在怎么处理:不处理
                 return null;
             }else{
 
@@ -63,7 +64,7 @@ public class QuerySchedule extends ActionSupport implements ServletResponseAware
             for (CourseInfo s : dac.selectByCondition(condition))
                 jsonArray.put(new JSONObject(s));
 
-            jsob.put("courses", jsonArray);
+            jsob.put(Config.COURSES, jsonArray);
         } catch (Exception e) {
 
         }

@@ -7,6 +7,8 @@ import cn.edu.fudan.se.dac.DACFactory;
 import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
 import com.course.bean.SchoolInfo;
+import com.course.function.Config;
+import com.course.function.Judge;
 import com.course.function.PrintToHtml;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONException;
@@ -42,32 +44,25 @@ public class AddSchoolInfo extends ActionSupport implements ServletResponseAware
             SchoolInfo si = new SchoolInfo();
             si.setSchoolName(schoolName);
             si.setCreditRequirement(creditRequirement);
+            if(Judge.isSchool(schoolName)){//学院不存在
+                //加入dac
+                DataAccessInterface<SchoolInfo> dac = DACFactory.getInstance().createDAC(SchoolInfo.class);
 
-            //加入dac
-            DataAccessInterface<SchoolInfo> dac = DACFactory.getInstance().createDAC(SchoolInfo.class);
-            Condition<SchoolInfo> condition = new Condition<SchoolInfo>() {
-                @Override
-                public boolean assertBean(SchoolInfo schoolInfo) {
-                    return schoolInfo.getSchoolName().equals(schoolName);
-                }
-            };
-            //TODO 判断是否已存等
-            List list = dac.selectByCondition(condition);
-            if (list.size() > 0) {
-                jsob.put("success", false);
-                jsob.put("failReason", "选课号已存在");
-            } else {
                 dac.beginTransaction();
                 dac.add(si);
                 dac.commit();
-                jsob.put("success", true);
+                jsob.put(Config.SUCCESS, true);
+            }else{
+                jsob.put(Config.SUCCESS, false);
+                jsob.put(Config.FAILREASON, Config.SCHOOL_EXIST);
             }
+
 
 
         } catch (Exception e) {
 
         }
-        ret=jsob.toString();
+        ret = jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
     }
