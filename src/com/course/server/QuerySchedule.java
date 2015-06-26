@@ -8,6 +8,7 @@ import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
 import com.course.bean.StudentInfo;
 import com.course.function.Config;
+import com.course.function.Servlet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,57 +28,24 @@ public class QuerySchedule extends ActionSupport implements ServletResponseAware
         this.response = httpServletResponse;
     }
 
-    private String studentId;
+    private JSONObject studentId;
 
     //定义处理用户请求的execute方法
     public String execute() {
         String ret = "";
-        JSONObject jsob = new JSONObject();
+        JSONObject jsob = Servlet.querySchedule(studentId);
         //TODO 代码写在这里
-        try {
-            //获得学生信息
-            DataAccessInterface<StudentInfo> dacStu = DACFactory.getInstance().createDAC(StudentInfo.class);
-            Condition<StudentInfo> conditionStu = new Condition<StudentInfo>() {
-                @Override
-                public boolean assertBean(StudentInfo StudentInfo) {
-                    return StudentInfo.getStudentId().equals(studentId);
-                }
-            };
-            List<StudentInfo> listStu = dacStu.selectByCondition(conditionStu);
-            if (listStu.size()==0){
-                //TODO 文档中没有，若学生id不存在怎么处理:不处理
-                return null;
-            }else{
 
-            }
-
-            //得到学生选的课程
-            DataAccessInterface<CourseInfo> dac = DACFactory.getInstance().createDAC(CourseInfo.class);
-            Condition<CourseInfo> condition = new Condition<CourseInfo>() {
-                @Override
-                public boolean assertBean(CourseInfo courseInfo) {
-                    return listStu.get(0).getCourseId().contains(courseInfo.getCourseId());
-                }
-            };
-            //得到所有course
-            JSONArray jsonArray = new JSONArray();
-            for (CourseInfo s : dac.selectByCondition(condition))
-                jsonArray.put(new JSONObject(s));
-
-            jsob.put(Config.COURSES, jsonArray);
-        } catch (Exception e) {
-
-        }
         ret = jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
     }
 
-    public String getStudentId() {
+    public JSONObject getStudentId() {
         return studentId;
     }
 
-    public void setStudentId(String studentId) {
+    public void setStudentId(JSONObject studentId) {
         this.studentId = studentId;
     }
 }

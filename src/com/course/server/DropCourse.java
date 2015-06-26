@@ -42,64 +42,7 @@ public class DropCourse extends ActionSupport implements ServletResponseAware {
     public String execute() {
         String ret = "";
         JSONObject jsob = new JSONObject();
-        try {
-            //TODO 代码写在这里
-            //TODO 判断 学号不存在、课程不存在、未选
-            if (!Judge.isStudent(studentId)){//学号存在
-                if (!Judge.isCourse(courseId)){//课程存在
-                    if (Judge.isSelect(studentId,courseId)){//学生已选这门课
 
-                        //修改学生选课信息
-                        DataAccessInterface<StudentInfo> dac = DACFactory.getInstance().createDAC(StudentInfo.class);
-                        Condition<StudentInfo> condition= new Condition<StudentInfo>(){
-                            @Override
-                            public boolean assertBean(StudentInfo studentInfo) {
-                                return studentInfo.getStudentId().equals(studentId);
-                            }
-                        };
-                        BeanSetter<StudentInfo> setter = new BeanSetter<StudentInfo>() {
-                            @Override
-                            public void set(StudentInfo studentInfo) {
-                                List<String> li = studentInfo.getCourseId();
-                                li.remove(courseId);
-                                studentInfo.setCourseId(li);
-                            }
-                        };
-                        dac.updateByCondition(condition, setter);
-
-                        //修改课程余量
-                        DataAccessInterface<CourseInfo> dacCou = DACFactory.getInstance().createDAC(CourseInfo.class);
-                        Condition<CourseInfo> conditionCou= new Condition<CourseInfo>(){
-                            @Override
-                            public boolean assertBean(CourseInfo courseInfo) {
-                                return courseInfo.getCourseId().equals(courseId);
-                            }
-                        };
-                        BeanSetter<CourseInfo> setterCou = new BeanSetter<CourseInfo>() {
-                            @Override
-                            public void set(CourseInfo courseInfo) {
-                                int surplus = courseInfo.getSurplus()+1;
-                                courseInfo.setSurplus(surplus);
-                            }
-                        };
-                        dacCou.updateByCondition(conditionCou, setterCou);
-
-                        jsob.put(Config.SUCCESS,true);
-                    }else {
-                        jsob.put(Config.SUCCESS,false);
-                        jsob.put(Config.FAILREASON,Config.STUDENT_NOT_SELECT);
-                    }
-                }else {
-                    jsob.put(Config.SUCCESS,false);
-                    jsob.put(Config.FAILREASON,Config.COURSE_NOT_EXIST);
-                }
-            }else {
-                jsob.put(Config.SUCCESS,false);
-                jsob.put(Config.FAILREASON,Config.STUDENT_NOT_EXIST);
-            }
-        }catch (Exception e){
-
-        }
 
         ret = jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);

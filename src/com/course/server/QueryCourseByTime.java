@@ -8,6 +8,7 @@ import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
 import com.course.bean.Time;
 import com.course.function.Config;
+import com.course.function.Servlet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,46 +28,23 @@ public class QueryCourseByTime extends ActionSupport implements ServletResponseA
         this.response = httpServletResponse;
     }
 
-    private Time time;
+    private JSONObject time;
 
     //定义处理用户请求的execute方法
     public String execute() {
         String ret = "";
-        JSONObject jsob = new JSONObject();
-        //TODO 代码写在这里
-        try {
-            DataAccessInterface<CourseInfo> dac = DACFactory.getInstance().createDAC(CourseInfo.class);
-            Condition<CourseInfo> condition = new Condition<CourseInfo>() {
-                @Override
-                public boolean assertBean(CourseInfo courseInfo) {
-                    if (courseInfo.getTime().getPeriod() == time.getPeriod() &&
-                            courseInfo.getTime().getWeekday() == time.getWeekday())
-                        return courseInfo.getTime().equals(time);
-                    else
-                        return false;
-                }
-            };
+        JSONObject jsob = Servlet.queryCourseByTime(time);
 
-            //得到所有course
-            JSONArray jsonArray = new JSONArray();
-            for (CourseInfo s : dac.selectByCondition(condition))
-                jsonArray.put(new JSONObject(s));
-
-            jsob.put(Config.COURSES, jsonArray);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         ret = jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
     }
 
-    public Time getTime() {
+    public JSONObject getTime() {
         return time;
     }
 
-    public void setTime(Time time) {
+    public void setTime(JSONObject time) {
         this.time = time;
     }
 }

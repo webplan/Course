@@ -28,14 +28,10 @@ public class ClearData extends ActionSupport implements ServletResponseAware {
 
     //定义处理用户请求的execute方法
     public String execute() {
-        String ret = "";
-        JSONObject obj = new JSONObject();
         //TODO 代码写在这里
             //TODO 清空dac
             //          方法1：使用给定的dulete方法，搜索所有dac，然后删除---太蠢
             //          方法2：删除文件----不知文件名
-        ret = obj.toString();
-        PrintToHtml.PrintToHtml(response, ret);
         return null;
     }
 

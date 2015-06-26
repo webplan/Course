@@ -8,6 +8,7 @@ import cn.edu.fudan.se.dac.DataAccessInterface;
 import com.course.bean.CourseInfo;
 import com.course.bean.StudentInfo;
 import com.course.function.Config;
+import com.course.function.Servlet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,42 +27,23 @@ public class QueryCourseById extends ActionSupport implements ServletResponseAwa
         this.response = httpServletResponse;
     }
 
-    private String courseId;
+    private JSONObject course;
 
     //定义处理用户请求的execute方法
     public String execute() {
         String ret = null;
-        JSONObject jsob = new JSONObject();
-        //TODO 代码写在这里
-        try {
-            DataAccessInterface<CourseInfo> dac = DACFactory.getInstance().createDAC(CourseInfo.class);
-            Condition<CourseInfo> condition = new Condition<CourseInfo>() {
-                @Override
-                public boolean assertBean(CourseInfo courseInfo) {
-                    return courseInfo.getCourseId().contains(courseId);
-                }
-            };
-            //得到所有course
-            JSONArray jsonArray = new JSONArray();
-            for (CourseInfo s : dac.selectByCondition(condition))
-                jsonArray.put(new JSONObject(s));
-            //课程信息不存在返回 null
-            if (jsonArray.length()==0)
-                jsonArray = null;
-            jsob.put(Config.COURSE,jsonArray);
-        } catch (Exception e) {
+        JSONObject jsob = Servlet.queryCourseById(course);
 
-        }
         ret = jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
     }
 
-    public String getCourseId() {
-        return courseId;
+    public JSONObject getCourse() {
+        return course;
     }
 
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
+    public void setCourse(JSONObject course) {
+        this.course = course;
     }
 }

@@ -10,6 +10,7 @@ import com.course.bean.SchoolInfo;
 import com.course.function.Config;
 import com.course.function.Judge;
 import com.course.function.PrintToHtml;
+import com.course.function.Servlet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,54 +33,23 @@ public class AddSchoolInfo extends ActionSupport implements ServletResponseAware
         this.response = httpServletResponse;
     }
 
-    private String schoolName;
-    private String creditRequirement;
+    private JSONObject school;
 
     //定义处理用户请求的execute方法
     public String execute() {
         String ret = "";
-        JSONObject jsob = new JSONObject();
-        //TODO 代码写在这里
-        try {
-            SchoolInfo si = new SchoolInfo();
-            si.setSchoolName(schoolName);
-            si.setCreditRequirement(creditRequirement);
-            if(Judge.isSchool(schoolName)){//学院不存在
-                //加入dac
-                DataAccessInterface<SchoolInfo> dac = DACFactory.getInstance().createDAC(SchoolInfo.class);
+        JSONObject jsob = Servlet.addSchoolInfo(school);
 
-                dac.beginTransaction();
-                dac.add(si);
-                dac.commit();
-                jsob.put(Config.SUCCESS, true);
-            }else{
-                jsob.put(Config.SUCCESS, false);
-                jsob.put(Config.FAILREASON, Config.SCHOOL_EXIST);
-            }
-
-
-
-        } catch (Exception e) {
-
-        }
         ret = jsob.toString();
         PrintToHtml.PrintToHtml(response, ret);
         return null;
     }
 
-    public String getSchoolName() {
-        return schoolName;
+    public JSONObject getSchool() {
+        return school;
     }
 
-    public void setSchoolName(String schoolName) {
-        this.schoolName = schoolName;
-    }
-
-    public String getCreditRequirement() {
-        return creditRequirement;
-    }
-
-    public void setCreditRequirement(String creditRequirement) {
-        this.creditRequirement = creditRequirement;
+    public void setSchool(JSONObject school) {
+        this.school = school;
     }
 }
