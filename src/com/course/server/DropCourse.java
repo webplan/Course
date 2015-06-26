@@ -35,13 +35,11 @@ public class DropCourse extends ActionSupport implements ServletResponseAware {
         this.response = httpServletResponse;
     }
 
-    private String courseId;
-    private String studentId;
-
+    private JSONObject drop;
     //定义处理用户请求的execute方法
     public String execute() {
         String ret = "";
-        JSONObject jsob = new JSONObject();
+        JSONObject jsob = new JSONObject(drop);
 
 
         ret = jsob.toString();
@@ -49,19 +47,11 @@ public class DropCourse extends ActionSupport implements ServletResponseAware {
         return null;
     }
 
-    public String getCourseId() {
-        return courseId;
+    public JSONObject getDrop() {
+        return drop;
     }
 
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
-    }
-
-    public String getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
+    public void setDrop(JSONObject drop) {
+        this.drop = drop;
     }
 }
